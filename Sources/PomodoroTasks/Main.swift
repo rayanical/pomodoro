@@ -1,11 +1,21 @@
 import AppKit
 import SwiftUI
 import UserNotifications
+import PomodoroCore
 
 @main
 struct PomodoroTasksApp: App {
-    @StateObject private var model = AppModel()
+    @StateObject private var model: AppModel
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
+    init() {
+        let defaults = UserDefaults.standard
+        PreferencesMigration.migrate(
+            from: defaults.persistentDomain(forName: PreferencesMigration.legacyDomain) ?? [:],
+            into: defaults
+        )
+        _model = StateObject(wrappedValue: AppModel())
+    }
 
     var body: some Scene {
         // Let macOS own both status-item clicks and outside dismissal. Separate

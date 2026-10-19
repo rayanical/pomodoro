@@ -55,7 +55,9 @@ Launch at login is enabled on first launch. Change it in the **…** menu or mac
 
 ## Data and permissions
 
-Everything is stored locally in macOS UserDefaults under `local.rayan.pomodoro-tasks`. The app has no analytics or network service. macOS manages notification and login-item permissions.
+Tasks and settings are saved locally on your Mac. The app has no analytics or network service. macOS manages notification and login-item permissions.
+
+Version 1.12 imports tasks and preferences from earlier versions automatically, keeping the original data as a fallback. macOS may ask you to allow notifications again after this update.
 
 Long titles stay on one row; hover to read the full title. The checklist grows rather than scrolls, so very long lists are limited by your screen height. Running timers use a deadline to catch up after sleep; macOS may deliver only the next scheduled phase notification while asleep.
 
@@ -86,7 +88,7 @@ SWIFTPM_MODULECACHE_OVERRIDE="$PWD/.build/module-cache" \
 swift run --disable-sandbox --cache-path .build/cache PomodoroCoreTests
 ```
 
-The executable test runner covers timer boundaries, sleep recovery, pause/resume/reset, task encoding, editing, reordering, and completed-task grouping. It works with Command Line Tools installations that lack usable XCTest/Swift Testing modules.
+The executable test runner covers timer boundaries, sleep recovery, pause/resume/reset, task encoding, editing, reordering, completed-task grouping, and migration from earlier app versions. It works with Command Line Tools installations that lack usable XCTest/Swift Testing modules.
 
 ### Find your way around
 

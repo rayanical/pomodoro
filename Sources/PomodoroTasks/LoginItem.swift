@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import ServiceManagement
+import PomodoroCore
 
 @MainActor
 final class LoginItem: ObservableObject {
@@ -12,6 +13,12 @@ final class LoginItem: ObservableObject {
     }
 
     func configureOnLaunch() {
+        let defaults = UserDefaults.standard
+        if defaults.bool(forKey: PreferencesMigration.loginItemKey) {
+            setEnabled(defaults.bool(forKey: "startupEnabled"))
+            if error == nil { defaults.removeObject(forKey: PreferencesMigration.loginItemKey) }
+            return
+        }
         // Enable once on installation, then respect changes made in the app or macOS.
         guard UserDefaults.standard.object(forKey: "configuredStartup") == nil else { return }
         setEnabled(true)

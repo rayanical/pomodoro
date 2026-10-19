@@ -103,6 +103,48 @@ func pauseResumeAndResetPreserveTimeAndPhase() {
     expect(timer.remainingSeconds(now: start) == 55)
 }
 
+func preferencesMigrationPreservesDataWithoutOverwritingNewSettings() throws {
+    let domain = "org.pomodoro.tests.\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: domain)!
+    defer { defaults.removePersistentDomain(forName: domain) }
+    let tasks = [ChecklistTask(title: "Saved task", isCompleted: true)]
+    let encoded = try JSONEncoder().encode(tasks)
+    let legacy: [String: Any] = [
+        "tasks": encoded, "workMinutes": 85, "breakMinutes": 5,
+        "newTaskDraft": "Unfinished draft", "moveCompletedToBottom": false,
+        "configuredStartup": true, "startupEnabled": false,
+        "startupError": "Old registration error"
+    ]
+    defaults.set(30, forKey: "workMinutes")
+    PreferencesMigration.migrate(from: legacy, into: defaults)
+    let imported = try JSONDecoder().decode([ChecklistTask].self, from: defaults.data(forKey: "tasks")!)
+    expect(imported == tasks)
+    expect(defaults.integer(forKey: "workMinutes") == 30)
+    expect(defaults.integer(forKey: "breakMinutes") == 5)
+    expect(defaults.string(forKey: "newTaskDraft") == "Unfinished draft")
+    expect(!defaults.bool(forKey: "moveCompletedToBottom"))
+    expect(defaults.object(forKey: "startupEnabled") as? Bool == false)
+    expect(defaults.bool(forKey: PreferencesMigration.loginItemKey))
+    expect(defaults.object(forKey: "startupError") == nil)
+    defaults.removeObject(forKey: "newTaskDraft")
+    PreferencesMigration.migrate(from: legacy, into: defaults)
+    expect(defaults.object(forKey: "newTaskDraft") == nil)
+
+    defaults.removePersistentDomain(forName: domain)
+    defaults.set(Data("new tasks".utf8), forKey: "tasks")
+    defaults.set(true, forKey: "configuredStartup")
+    PreferencesMigration.migrate(from: legacy, into: defaults)
+    expect(defaults.data(forKey: "tasks") == Data("new tasks".utf8))
+    expect(!defaults.bool(forKey: PreferencesMigration.loginItemKey))
+
+    defaults.removePersistentDomain(forName: domain)
+    PreferencesMigration.migrate(from: [:], into: defaults)
+    expect(defaults.bool(forKey: PreferencesMigration.completionKey))
+    expect(defaults.object(forKey: "tasks") == nil)
+    expect(!defaults.bool(forKey: PreferencesMigration.loginItemKey))
+}
+
+try preferencesMigrationPreservesDataWithoutOverwritingNewSettings()
 pauseResumeAndResetPreserveTimeAndPhase()
 timerTransitionsAtExactBoundaries()
 timerCatchesUpAfterSleepWithoutDrifting()
@@ -119,4 +161,4 @@ grouped.moveCompletedToBottom()
 expect(grouped.tasks.map(\.title) == ["Open one", "Open two", "Done one", "Done two"])
 expect(Set(grouped.tasks.map(\.id)) == groupedIDs)
 expect(grouped.tasks.suffix(2).allSatisfy(\.isCompleted))
-print("Passed: timer boundaries, sleep recovery, checklist persistence, editing, reordering and completion grouping")
+print("Passed: timer boundaries, sleep recovery, checklist persistence, editing, reordering, completion grouping and preferences migration")

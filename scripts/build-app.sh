@@ -14,13 +14,13 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
 <key>CFBundleExecutable</key><string>Pomodoro</string>
-<key>CFBundleIdentifier</key><string>local.rayan.pomodoro-tasks</string>
+<key>CFBundleIdentifier</key><string>org.pomodoro.menubar</string>
 <key>CFBundleName</key><string>Pomodoro</string>
 <key>CFBundleDisplayName</key><string>Pomodoro</string>
 <key>CFBundleIconFile</key><string>Pomodoro</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>1.11</string>
-<key>CFBundleVersion</key><string>12</string>
+<key>CFBundleShortVersionString</key><string>1.12</string>
+<key>CFBundleVersion</key><string>13</string>
 <key>LSMinimumSystemVersion</key><string>26.0</string>
 <key>LSUIElement</key><true/>
 <key>NSHighResolutionCapable</key><true/>
